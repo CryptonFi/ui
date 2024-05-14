@@ -1,0 +1,7 @@
+{
+    "url": "<app url>",
+    "name": "Crypton admin UI",
+    "iconUrl": "<app url>/apple-touch-icon.png",
+    "termsOfUseUrl": "<app url>/terms-of-use.txt",
+    "privacyPolicyUrl": "<app url>/privacy-policy.txt"
+}
