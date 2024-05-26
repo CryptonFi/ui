@@ -2,7 +2,7 @@ import { TonClient } from '@ton/ton';
 import { Address, beginCell, toNano } from '@ton/core';
 import { isAxiosError } from 'axios';
 import { getHttpEndpoint } from '@orbs-network/ton-access';
-import { ADDRESS_CURRENCIES, MASTER_ORDER_ADDRESS, TON_CLIENT_URL } from './Config';
+import { ADDRESS_CURRENCIES, MASTER_ORDER_ADDRESS } from './Config';
 import { MasterOrder } from './Wrappers/MasterOrder';
 import { OrderData, UserOrder } from './Wrappers/UserOrder';
 import { sleep } from './Helpers';
@@ -11,9 +11,15 @@ import { TonConnectUI } from '@tonconnect/ui-react';
 
 export type OrderRes = OrderData & { orderId: string };
 
+export async function getTonClient() {
+    // TODO: create client only once
+    const endpoint = await getHttpEndpoint({ network: 'testnet' });
+    return new TonClient({ endpoint });
+}
+
 export async function FetchOrderDetails(userAddress: string): Promise<Array<OrderRes>> {
     // TODO: create client only once
-    const client = new TonClient({ endpoint: TON_CLIENT_URL });
+    const client = await getTonClient();
 
     const masterContract = client.open(new MasterOrder(MASTER_ORDER_ADDRESS));
     const userOrderAddress = await masterContract.getWalletAddress(Address.parse(userAddress));
@@ -43,7 +49,8 @@ export async function PositionToString(address: Address | null, isMaster: boolea
     }
 
     // TODO: create client only once
-    const client = new TonClient({ endpoint: TON_CLIENT_URL });
+    const client = await getTonClient();
+
     const masterAddr = isMaster ? address : await loadMasterAddr(client, address);
 
     // TODO: Load currency simbol and decimals from contract
@@ -59,8 +66,8 @@ export async function loadMasterAddr(client: TonClient, address: Address): Promi
     for (let i = 0; i < retriesAmount; i++) {
         try {
             const res = await client.runMethod(address, 'get_wallet_data');
-            const balance = res.stack.readBigNumber();
-            const owner = res.stack.readAddress();
+            res.stack.readBigNumber(); // balance
+            res.stack.readAddress(); // owner
             const masterAddr = res.stack.readAddress();
             return masterAddr;
         } catch (err) {
@@ -80,9 +87,7 @@ export async function createNewOrder(
     toAddr: string,
     toAmount: bigint
 ) {
-    // TODO: create client only once
-    const endpoint = await getHttpEndpoint({ network: 'testnet' });
-    const client = new TonClient({ endpoint });
+    const client = await getTonClient();
 
     const masterContract = client.open(new MasterOrder(MASTER_ORDER_ADDRESS));
     const jettonFromContract = client.open(JettonMinter.createFromAddress(Address.parse(fromAddr)));
