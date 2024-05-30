@@ -1,8 +1,8 @@
 import { FC } from 'react';
+import { useTonAddress, useTonConnectUI } from '@tonconnect/ui-react';
 import Button from '../ui/Button';
 import { CURRENCY_ADDRESSES } from '../../api/Config';
-import { createNewOrder } from '../../api/Order';
-import { useTonAddress, useTonConnectUI } from '@tonconnect/ui-react';
+import { CreateJettonJettonOrder, CreateJettonTonOrder, CreateTonJettonOrder } from '../../api/Order';
 
 interface NewOrderModalProps {
     showModal: boolean;
@@ -18,18 +18,34 @@ const NewOrderModal: FC<NewOrderModalProps> = ({ showModal, closeModal }) => {
         const formData = new FormData(event.currentTarget);
 
         const fromCurr = formData.get('from-curr')?.toString() || '';
-        const fromAddr = CURRENCY_ADDRESSES[fromCurr];
         const fromAmountStr = formData.get('from-amount')?.toString() || '';
         const fromAmount = BigInt(fromAmountStr);
 
         const toCurr = formData.get('to-curr')?.toString() || '';
-        const toAddr = CURRENCY_ADDRESSES[toCurr];
         const toAmountStr = formData.get('to-amount')?.toString() || '';
         const toAmount = BigInt(toAmountStr);
 
-        createNewOrder(tonConnectUI, userAddress, fromAddr, fromAmount, toAddr, toAmount).catch((e) =>
-            console.error(`Order creation failed with: ${e}`)
-        );
+        if (fromCurr !== 'TON' && toCurr !== 'TON') {
+            CreateJettonJettonOrder(
+                tonConnectUI,
+                userAddress,
+                CURRENCY_ADDRESSES[fromCurr],
+                fromAmount,
+                CURRENCY_ADDRESSES[toCurr],
+                toAmount
+            ).catch((e: any) => console.error(`Order creation failed with: ${e}`));
+        } else if (fromCurr === 'TON' && toCurr !== 'TON') {
+            CreateTonJettonOrder(tonConnectUI, userAddress, fromAmount, CURRENCY_ADDRESSES[toCurr], toAmount).catch(
+                (e: any) => console.error(`Order creation failed with: ${e}`)
+            );
+        } else if (fromCurr !== 'TON' && toCurr === 'TON') {
+            CreateJettonTonOrder(tonConnectUI, userAddress, CURRENCY_ADDRESSES[fromCurr], fromAmount, toAmount).catch(
+                (e: any) => console.error(`Order creation failed with: ${e}`)
+            );
+        } else {
+            console.error('Unsupported order type');
+        }
+
         closeModal();
     };
 

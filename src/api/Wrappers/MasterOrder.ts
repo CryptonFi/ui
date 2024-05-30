@@ -20,10 +20,7 @@ export function masterOrderConfigToCell(config: MasterOrderConfig): Cell {
 }
 
 export class MasterOrder implements Contract {
-    constructor(
-        readonly address: Address,
-        readonly init?: { code: Cell; data: Cell },
-    ) {}
+    constructor(readonly address: Address, readonly init?: { code: Cell; data: Cell }) {}
 
     static createFromAddress(address: Address) {
         return new MasterOrder(address);
@@ -53,7 +50,7 @@ export class MasterOrder implements Contract {
             toAddress: Address;
             toAmount: number;
             toMasterAddress: Address;
-        },
+        }
     ) {
         const result = await provider.internal(via, {
             value: opts.value + opts.fromAmount,

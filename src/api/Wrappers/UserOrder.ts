@@ -42,10 +42,7 @@ export function userOrderConfigToCell(config: UserOrderConfig): Cell {
 }
 
 export class UserOrder implements Contract {
-    constructor(
-        readonly address: Address,
-        readonly init?: { code: Cell; data: Cell },
-    ) {}
+    constructor(readonly address: Address, readonly init?: { code: Cell; data: Cell }) {}
 
     static createFromAddress(address: Address) {
         return new UserOrder(address);
@@ -72,7 +69,7 @@ export class UserOrder implements Contract {
             value: bigint;
             queryId: number;
             orderId: bigint;
-        },
+        }
     ) {
         const result = await provider.internal(via, {
             value: opts.value,
@@ -94,7 +91,7 @@ export class UserOrder implements Contract {
             value: bigint;
             queryId: number;
             orderId: bigint;
-        },
+        }
     ) {
         const result = await provider.internal(via, {
             value: opts.value,

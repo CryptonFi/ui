@@ -4,26 +4,33 @@ import { isAxiosError } from 'axios';
 import { getHttpEndpoint } from '@orbs-network/ton-access';
 import { ADDRESS_CURRENCIES, MASTER_ORDER_ADDRESS } from './Config';
 import { MasterOrder } from './Wrappers/MasterOrder';
-import { OrderData, UserOrder } from './Wrappers/UserOrder';
+import { OrderData, OrderType, UserOrder } from './Wrappers/UserOrder';
 import { sleep } from './Helpers';
 import { JettonMinter } from './Wrappers/JettonMinter';
 import { TonConnectUI } from '@tonconnect/ui-react';
 
 export type OrderRes = OrderData & { orderId: string };
 
-export async function getTonClient() {
-    // TODO: create client only once
-    const endpoint = await getHttpEndpoint({ network: 'testnet' });
-    return new TonClient({ endpoint });
+let _tonClient: TonClient;
+
+async function GetTonClient() {
+    if (_tonClient === undefined) {
+        const endpoint = await getHttpEndpoint({ network: 'testnet' });
+        _tonClient = new TonClient({ endpoint });
+    }
+    return _tonClient;
 }
 
-export async function FetchOrderDetails(userAddress: string): Promise<Array<OrderRes>> {
-    // TODO: create client only once
-    const client = await getTonClient();
-
+export async function GetUserOrderAddress(userAddress: string): Promise<Address> {
+    const client = await GetTonClient();
     const masterContract = client.open(new MasterOrder(MASTER_ORDER_ADDRESS));
-    const userOrderAddress = await masterContract.getWalletAddress(Address.parse(userAddress));
 
+    return await masterContract.getWalletAddress(Address.parse(userAddress));
+}
+
+export async function FetchOrderDetails(userOrderAddress: Address): Promise<Array<OrderRes>> {
+    // TODO: create client only once
+    const client = await GetTonClient();
     const UserOrderContract = client.open(new UserOrder(userOrderAddress));
     const ordersDict = await UserOrderContract.getOrders();
 
@@ -49,9 +56,9 @@ export async function PositionToString(address: Address | null, isMaster: boolea
     }
 
     // TODO: create client only once
-    const client = await getTonClient();
+    const client = await GetTonClient();
 
-    const masterAddr = isMaster ? address : await loadMasterAddr(client, address);
+    const masterAddr = isMaster ? address : await LoadMasterAddr(client, address);
 
     // TODO: Load currency simbol and decimals from contract
     const currency = masterAddr ? ADDRESS_CURRENCIES[masterAddr.toString()] || masterAddr.toString() : '<unknown>';
@@ -61,7 +68,7 @@ export async function PositionToString(address: Address | null, isMaster: boolea
     return `${amountN} ${currency}`;
 }
 
-export async function loadMasterAddr(client: TonClient, address: Address): Promise<Address | undefined> {
+async function LoadMasterAddr(client: TonClient, address: Address): Promise<Address | undefined> {
     const retriesAmount = 3;
     for (let i = 0; i < retriesAmount; i++) {
         try {
@@ -79,7 +86,7 @@ export async function loadMasterAddr(client: TonClient, address: Address): Promi
     }
 }
 
-export async function createNewOrder(
+export async function CreateJettonJettonOrder(
     tonConnectUI: TonConnectUI,
     creatorAddr: string,
     fromAddr: string,
@@ -87,15 +94,65 @@ export async function createNewOrder(
     toAddr: string,
     toAmount: bigint
 ) {
-    const client = await getTonClient();
-
+    const client = await GetTonClient();
     const masterContract = client.open(new MasterOrder(MASTER_ORDER_ADDRESS));
+    const userOrderAddr = await masterContract.getWalletAddress(Address.parse(creatorAddr));
+
     const jettonFromContract = client.open(JettonMinter.createFromAddress(Address.parse(fromAddr)));
     const jettonToContract = client.open(JettonMinter.createFromAddress(Address.parse(toAddr)));
 
     const userJettonFromWalletAddr = await jettonFromContract.getWalletAddress(Address.parse(creatorAddr));
-    const userOrderAddr = await masterContract.getWalletAddress(Address.parse(creatorAddr));
     const userOrderJettonToAddr = await jettonToContract.getWalletAddress(userOrderAddr);
+
+    const query_id = 123;
+
+    const res = await tonConnectUI.sendTransaction({
+        // 10 minutes from now
+        validUntil: Math.floor(Date.now() / 1000) + 600,
+        messages: [
+            {
+                amount: toNano(0.3).toString(),
+                address: userJettonFromWalletAddr.toString(),
+                payload: beginCell()
+                    .storeUint(0xf8a7ea5, 32) // op code - jetton transfer
+                    .storeUint(query_id, 64)
+                    // TODO: replace toNano!
+                    .storeCoins(toNano(fromAmount))
+                    .storeAddress(MASTER_ORDER_ADDRESS)
+                    .storeAddress(Address.parse(creatorAddr))
+                    .storeBit(0)
+                    .storeCoins(toNano('0.2'))
+                    .storeBit(1)
+                    .storeRef(
+                        beginCell()
+                            .storeUint(0xc1c6ebf9, 32) // op code - create_order
+                            .storeUint(query_id, 64)
+                            .storeUint(OrderType.JETTON_JETTON, 8)
+                            .storeAddress(userOrderJettonToAddr)
+                            .storeCoins(toNano(toAmount))
+                            .storeAddress(Address.parse(toAddr))
+                            .endCell()
+                    )
+                    .endCell()
+                    .toBoc()
+                    .toString('base64'),
+            },
+        ],
+    });
+
+    console.log(`Result is: ${res.boc}`);
+}
+
+export async function CreateJettonTonOrder(
+    tonConnectUI: TonConnectUI,
+    creatorAddr: string,
+    fromAddr: string,
+    fromAmount: bigint,
+    toAmount: bigint
+) {
+    const client = await GetTonClient();
+    const jettonFromContract = client.open(JettonMinter.createFromAddress(Address.parse(fromAddr)));
+    const userJettonFromWalletAddr = await jettonFromContract.getWalletAddress(Address.parse(creatorAddr));
 
     const query_id = 123;
     const res = await tonConnectUI.sendTransaction({
@@ -119,12 +176,134 @@ export async function createNewOrder(
                         beginCell()
                             .storeUint(0xc1c6ebf9, 32) // op code - create_order
                             .storeUint(query_id, 64)
-                            .storeUint(0, 8)
-                            .storeAddress(userOrderJettonToAddr)
+                            .storeUint(OrderType.JETTON_TON, 8)
                             .storeCoins(toNano(toAmount))
-                            .storeAddress(Address.parse(toAddr))
                             .endCell()
                     )
+                    .endCell()
+                    .toBoc()
+                    .toString('base64'),
+            },
+        ],
+    });
+
+    console.log(`Result is: ${res.boc}`);
+}
+
+export async function CreateTonJettonOrder(
+    tonConnectUI: TonConnectUI,
+    creatorAddr: string,
+    fromAmount: bigint,
+    toAddr: string,
+    toAmount: bigint
+) {
+    const client = await GetTonClient();
+    const masterContract = client.open(new MasterOrder(MASTER_ORDER_ADDRESS));
+    const userOrderAddr = await masterContract.getWalletAddress(Address.parse(creatorAddr));
+    const jettonToContract = client.open(JettonMinter.createFromAddress(Address.parse(toAddr)));
+    const userOrderJettonToAddr = await jettonToContract.getWalletAddress(userOrderAddr);
+
+    const queryId = 123;
+    const res = await tonConnectUI.sendTransaction({
+        // 10 minutes from now
+        validUntil: Math.floor(Date.now() / 1000) + 600,
+        messages: [
+            {
+                amount: (toNano(fromAmount) + toNano(0.4)).toString(),
+                address: MASTER_ORDER_ADDRESS.toString(),
+                payload: beginCell()
+                    .storeUint(0x76fd6f67, 32) // create_ton_order
+                    .storeUint(queryId, 64)
+                    .storeCoins(toNano(fromAmount))
+                    .storeAddress(userOrderJettonToAddr)
+                    .storeCoins(toNano(toAmount))
+                    .storeAddress(Address.parse(toAddr))
+                    .endCell()
+                    .toBoc()
+                    .toString('base64'),
+            },
+        ],
+    });
+
+    console.log(`Result is: ${res.boc}`);
+}
+
+export async function ExecuteOrders(
+    tonConnectUI: TonConnectUI,
+    userOrderAddr: Address,
+    executorAddr: string,
+    orders: Array<OrderRes>
+) {
+    const client = await GetTonClient();
+
+    const query_id = 123;
+    const messages = [];
+    for (const order of orders) {
+        if (order.orderType !== OrderType.JETTON_TON) {
+            const jettonToContract = client.open(JettonMinter.createFromAddress(order.toMasterAddress!));
+            const executorJettonWalletAddr = await jettonToContract.getWalletAddress(Address.parse(executorAddr));
+            const msg = {
+                amount: toNano(0.3).toString(),
+                address: executorJettonWalletAddr.toString(),
+                payload: beginCell()
+                    .storeUint(0xf8a7ea5, 32) // op code - jetton transfer
+                    .storeUint(query_id, 64)
+                    // TODO: replace toNano!
+                    .storeCoins(order.toAmount)
+                    .storeAddress(userOrderAddr)
+                    .storeAddress(Address.parse(executorAddr))
+                    .storeBit(0)
+                    .storeCoins(toNano('0.2'))
+                    .storeBit(1)
+                    .storeRef(
+                        beginCell()
+                            .storeUint(0xa0cef9d9, 32) // op code - execute_order
+                            .storeUint(query_id, 64) // query id
+                            .storeUint(BigInt(order.orderId), 256) // order id
+                            .endCell()
+                    )
+                    .endCell()
+                    .toBoc()
+                    .toString('base64'),
+            };
+            messages.push(msg);
+        } else {
+            const msg = {
+                amount: toNano(0.3).toString(),
+                address: userOrderAddr.toString(),
+                payload: beginCell()
+                    .storeUint(0x3b016c81, 32) // execute_order
+                    .storeUint(query_id, 64)
+                    .storeUint(BigInt(order.orderId), 256)
+                    .endCell()
+                    .toBoc()
+                    .toString('base64'),
+            };
+            messages.push(msg);
+        }
+    }
+
+    const res = await tonConnectUI.sendTransaction({
+        // 10 minutes from now
+        validUntil: Math.floor(Date.now() / 1000) + 600,
+        messages: messages,
+    });
+    console.log(`Result is: ${res.boc}`);
+}
+
+export async function CloseOrder(tonConnectUI: TonConnectUI, userOrderAddr: Address, orderId: string) {
+    const queryId = 123;
+    const res = await tonConnectUI.sendTransaction({
+        // 10 minutes from now
+        validUntil: Math.floor(Date.now() / 1000) + 600,
+        messages: [
+            {
+                amount: toNano(0.2).toString(),
+                address: userOrderAddr.toString(),
+                payload: beginCell()
+                    .storeUint(0xdf32c0c8, 32) // close_order
+                    .storeUint(queryId, 64)
+                    .storeUint(BigInt(orderId), 256)
                     .endCell()
                     .toBoc()
                     .toString('base64'),

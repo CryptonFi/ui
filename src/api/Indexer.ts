@@ -5,16 +5,16 @@ import { Address } from '@ton/core';
 
 const MAX_RETRIES = 3;
 
-export async function CollectUserContractAddresses(limit: number): Promise<Array<Address>> {
+export async function CollectUserContractAddresses(limit: number): Promise<Array<string>> {
     // TODO: create tonApi only once
     const tonApi = axios.create({ baseURL: TON_API_ENDPOINT });
     return ParseTransactions(tonApi, limit);
 }
 
-async function ParseTransactions(tonApi: AxiosInstance, limit: number): Promise<Array<Address>> {
+async function ParseTransactions(tonApi: AxiosInstance, limit: number): Promise<Array<string>> {
     let before_lt = 0;
     let attempts = 0;
-    let addresses = new Set<Address>([]);
+    let addresses = new Set<string>([]);
 
     while (true) {
         let result: AxiosResponse<any, any>;
@@ -43,7 +43,7 @@ async function ParseTransactions(tonApi: AxiosInstance, limit: number): Promise<
 
             for (const msg of transaction.out_msgs) {
                 if (msg.op_code === undefined) {
-                    addresses.add(Address.parseRaw(msg.destination.address));
+                    addresses.add(Address.parseRaw(msg.destination.address).toString());
                 }
             }
         }

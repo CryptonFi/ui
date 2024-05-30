@@ -12,6 +12,7 @@ export const OP_EXECUTE_JETTON_ORDER = 0xa0cef9d9;
 export const OP_EXECUTE_TON_ORDER = 0x3b016c81;
 
 export const CURRENCY_ADDRESSES: Record<string, string> = {
+    TON: '0',
     BaTON: 'EQDLTkIMPWon-XoLCpMqWXsnn8a1Zgeav6xkqB-TOtHgWd8B',
     BitcoinJetton: 'EQAj_XKstRJvDdHjUSVN79bPZtCbYrnalEkafPQXmkCpoEq_',
     LuiviTON: 'EQBCSiok2KOPeq5T0xcoJ48YZYq9WRDbGFNzTeVjWOKvL9kX',
@@ -21,3 +22,9 @@ export const ADDRESS_CURRENCIES = Object.assign(
     {},
     ...Object.entries(CURRENCY_ADDRESSES).map(([a, b]) => ({ [b]: a }))
 );
+
+export enum OrderType {
+    JETTON_JETTON = 0,
+    JETTON_TON = 1,
+    TON_JETTON = 2,
+}
