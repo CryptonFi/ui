@@ -4,17 +4,28 @@ import { CloseOrder, OrderRes, PositionToString } from '../../api/Order';
 import { FaArrowRightLong } from 'react-icons/fa6';
 import { useTonConnectUI } from '@tonconnect/ui-react';
 import { Address } from '@ton/core';
-import { IconContext } from 'react-icons';
+import tonLogo from '../../assets/ton.png';
 
 interface OrderItemProps extends OrderRes {
     selectOrder: ChangeEventHandler<HTMLInputElement>;
-    userOrderAddress: Address;
+    userOrderAddress?: Address;
 }
 
 const OrderItem: FC<OrderItemProps> = (props) => {
     const [fromStr, setFromStr] = useState('');
     const [toStr, setToStr] = useState('');
     const [tonConnectUI] = useTonConnectUI();
+
+    const tonImg = (
+        <img
+            src={tonLogo}
+            alt="TON"
+            className="size-6 ml-1 inline rounded-full outline outline-[1px] outline-offset-[-1px] outline-stroke"
+        ></img>
+    );
+    // TODO: add other jetton logos
+    const fromLogo = !props.fromAddress ? tonImg : '';
+    const toLogo = !props.toAddress ? tonImg : '';
 
     useEffect(() => {
         async function loadPositionRepr() {
@@ -25,9 +36,13 @@ const OrderItem: FC<OrderItemProps> = (props) => {
     }, []);
 
     const CloseOrderUI = () => {
-        CloseOrder(tonConnectUI, props.userOrderAddress, props.orderId).catch((e) =>
-            console.error(`Order removal failed with: ${e}`)
-        );
+        if (props.userOrderAddress) {
+            CloseOrder(tonConnectUI, props.userOrderAddress, props.orderId).catch((e) =>
+                console.error(`Order removal failed with: ${e}`)
+            );
+        } else {
+            console.error(`userOrderAddress is undefined`);
+        }
     };
 
     return (
@@ -41,12 +56,16 @@ const OrderItem: FC<OrderItemProps> = (props) => {
             />
             <div className="">
                 From:
-                <p className="font-bold">{fromStr}</p>
+                <p className="font-bold flex items-center">
+                    {fromStr} {fromLogo}
+                </p>
             </div>
             <FaArrowRightLong className="mx-8" />
             <div>
                 To:
-                <p className="font-bold">{toStr}</p>
+                <p className="font-bold flex items-center">
+                    {toStr} {toLogo}
+                </p>
             </div>
             <div className="ml-auto hover:bg-gray-300">
                 <FaRegTrashAlt onClick={CloseOrderUI} fontSize="1.1em" />

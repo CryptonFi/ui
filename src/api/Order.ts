@@ -55,7 +55,6 @@ export async function PositionToString(address: Address | null, isMaster: boolea
         return `${Number((amount * 100n) / 1_000_000_000n) / 100} TON`;
     }
 
-    // TODO: create client only once
     const client = await GetTonClient();
 
     const masterAddr = isMaster ? address : await LoadMasterAddr(client, address);
