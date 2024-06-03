@@ -1,5 +1,5 @@
 import { FC } from 'react';
-import { ContractsList } from '../components/UserContracts/ContractsList';
+import { ContractsList } from '../../components/UserContracts/ContractsList';
 
 interface AdminPageProps {}
 

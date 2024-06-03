@@ -1,13 +1,13 @@
 import { TonClient } from '@ton/ton';
 import { Address, beginCell, toNano } from '@ton/core';
 import { isAxiosError } from 'axios';
+import { TonConnectUI } from '@tonconnect/ui-react';
 import { getHttpEndpoint } from '@orbs-network/ton-access';
 import { ADDRESS_CURRENCIES, MASTER_ORDER_ADDRESS } from './Config';
+import { sleep } from './Helpers';
 import { MasterOrder } from './Wrappers/MasterOrder';
 import { OrderData, OrderType, UserOrder } from './Wrappers/UserOrder';
-import { sleep } from './Helpers';
 import { JettonMinter } from './Wrappers/JettonMinter';
-import { TonConnectUI } from '@tonconnect/ui-react';
 
 export type OrderRes = OrderData & { orderId: string };
 
@@ -29,7 +29,6 @@ export async function GetUserOrderAddress(userAddress: string): Promise<Address>
 }
 
 export async function FetchOrderDetails(userOrderAddress: Address): Promise<Array<OrderRes>> {
-    // TODO: create client only once
     const client = await GetTonClient();
     const UserOrderContract = client.open(new UserOrder(userOrderAddress));
     const ordersDict = await UserOrderContract.getOrders();

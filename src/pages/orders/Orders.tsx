@@ -1,11 +1,11 @@
 import { ChangeEventHandler, FC, useEffect, useState } from 'react';
-import { useLocation, useParams } from 'react-router';
 import { useTonAddress, useTonConnectUI } from '@tonconnect/ui-react';
-import { ExecuteOrders, FetchOrderDetails, GetUserOrderAddress, OrderRes } from '../api/Order';
-import OrderItem from '../components/Orders/OrderItem';
-import Button from '../components/ui/Button';
-import NewOrderModal from '../components/Orders/NewOrderModal';
+import { useSearchParams } from 'react-router-dom';
 import { Address } from '@ton/core';
+import { ExecuteOrders, FetchOrderDetails, GetUserOrderAddress, OrderRes } from '../../api/Order';
+import OrderItem from '../../components/Orders/OrderItem';
+import Button from '../../components/ui/Button';
+import NewOrderModal from '../../components/Orders/NewOrderModal';
 
 const OrdersPage: FC = () => {
     const [orders, setOrders] = useState<Array<OrderRes>>([]);
@@ -14,16 +14,23 @@ const OrdersPage: FC = () => {
     const [showCreateOrder, setShowCreateOrder] = useState<boolean>(false);
     const [selectedOrders, setSelectedOrders] = useState<Array<string>>([]);
 
-    const [tonConnectUI] = useTonConnectUI();
-    const curUserAddress = useTonAddress();
+    const [queryParams, _] = useSearchParams();
+    const urlAddr = queryParams.get('address');
 
-    const { pathname } = useLocation();
-    let addr = pathname === '/' ? curUserAddress : useParams().address || '';
+    const [tonConnectUI] = useTonConnectUI();
+    const addr = useTonAddress();
     if (userAddress !== addr) setUserAddress(addr);
 
     useEffect(() => {
         if (userAddress === '') return;
-        GetUserOrderAddress(userAddress).then(setUserOrderAddress);
+
+        if (!urlAddr) {
+            GetUserOrderAddress(userAddress).then(setUserOrderAddress);
+            return;
+        }
+
+        if (urlAddr) setUserOrderAddress(Address.parse(urlAddr));
+        else console.error('invalid url address');
     }, [userAddress]);
     useEffect(() => {
         if (userOrderAddress === undefined) return;
@@ -38,7 +45,7 @@ const OrdersPage: FC = () => {
     const executeSelectedOrders = () => {
         const ordersList = orders.filter((i) => selectedOrders.includes(i.orderId));
         if (userOrderAddress)
-            ExecuteOrders(tonConnectUI, userOrderAddress, curUserAddress, ordersList)
+            ExecuteOrders(tonConnectUI, userOrderAddress, userAddress, ordersList)
                 .then(() => {
                     setSelectedOrders([]);
                 })
@@ -48,7 +55,7 @@ const OrdersPage: FC = () => {
     return (
         <div className="orderDetails">
             <div>
-                <h1 className="text-3xl m-7">{pathname === '/' ? 'My orders:' : 'User orders:'}</h1>
+                <h1 className="text-3xl m-7">{!urlAddr ? 'My orders:' : 'User orders:'}</h1>
                 {orders.length > 0 ? (
                     orders.map((o, id) => (
                         <OrderItem key={id} {...o} selectOrder={selectOrdersFunc} userOrderAddress={userOrderAddress} />
