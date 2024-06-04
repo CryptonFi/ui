@@ -16,6 +16,7 @@ const OrdersPage: FC = () => {
 
     const [queryParams, _] = useSearchParams();
     const urlAddr = queryParams.get('address');
+    const isAdmin = !!urlAddr;
 
     const [tonConnectUI] = useTonConnectUI();
     const addr = useTonAddress();
@@ -24,13 +25,11 @@ const OrdersPage: FC = () => {
     useEffect(() => {
         if (userAddress === '') return;
 
-        if (!urlAddr) {
+        if (isAdmin) {
+            setUserOrderAddress(Address.parse(urlAddr));
+        } else {
             GetUserOrderAddress(userAddress).then(setUserOrderAddress);
-            return;
         }
-
-        if (urlAddr) setUserOrderAddress(Address.parse(urlAddr));
-        else console.error('invalid url address');
     }, [userAddress]);
     useEffect(() => {
         if (userOrderAddress === undefined) return;
@@ -55,7 +54,7 @@ const OrdersPage: FC = () => {
     return (
         <div className="orderDetails">
             <div>
-                <h1 className="text-3xl m-7">{!urlAddr ? 'My orders:' : 'User orders:'}</h1>
+                <h1 className="text-3xl m-7">{isAdmin ? 'User orders:' : 'My orders:'}</h1>
                 {orders.length > 0 ? (
                     orders.map((o, id) => (
                         <OrderItem key={id} {...o} selectOrder={selectOrdersFunc} userOrderAddress={userOrderAddress} />
@@ -69,6 +68,7 @@ const OrdersPage: FC = () => {
                 title={'Execute order'}
                 className="my-3"
                 onClick={executeSelectedOrders}
+                hidden={!isAdmin}
                 disabled={selectedOrders.length === 0}
             />
 

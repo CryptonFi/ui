@@ -4,10 +4,12 @@ interface ButtonProps {
     title: string;
     className?: string;
     onClick?: MouseEventHandler<HTMLButtonElement>;
+    hidden?: boolean;
     disabled?: boolean;
 }
 
-const Button: FC<ButtonProps> = ({ title, className, onClick, disabled }) => {
+const Button: FC<ButtonProps> = ({ title, className, onClick, hidden, disabled }) => {
+    if (hidden) return <></>;
     return (
         <button
             onClick={onClick}
