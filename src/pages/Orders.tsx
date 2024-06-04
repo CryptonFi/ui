@@ -2,12 +2,12 @@ import { ChangeEventHandler, FC, useEffect, useState } from 'react';
 import { useTonAddress, useTonConnectUI } from '@tonconnect/ui-react';
 import { useSearchParams } from 'react-router-dom';
 import { Address } from '@ton/core';
-import { ExecuteOrders, FetchOrderDetails, GetUserOrderAddress, OrderRes } from '../../api/Order';
-import OrderItem from '../../components/Orders/OrderItem';
-import Button from '../../components/ui/Button';
-import NewOrderModal from '../../components/Orders/NewOrderModal';
+import { ExecuteOrders, FetchOrderDetails, GetUserOrderAddress, OrderRes } from '../api/Order';
+import OrderItem from '../components/Orders/OrderItem';
+import Button from '../components/ui/Button';
+import NewOrderModal from '../components/Orders/NewOrderModal';
 
-const OrdersPage: FC = () => {
+const Orders: FC = () => {
     const [orders, setOrders] = useState<Array<OrderRes>>([]);
     const [userAddress, setUserAddress] = useState<string>('');
     const [userOrderAddress, setUserOrderAddress] = useState<Address>();
@@ -16,7 +16,7 @@ const OrdersPage: FC = () => {
 
     const [queryParams, _] = useSearchParams();
     const urlAddr = queryParams.get('address');
-    const isAdmin = !!urlAddr;
+    const isExternal = !!urlAddr;
 
     const [tonConnectUI] = useTonConnectUI();
     const addr = useTonAddress();
@@ -25,7 +25,7 @@ const OrdersPage: FC = () => {
     useEffect(() => {
         if (userAddress === '') return;
 
-        if (isAdmin) {
+        if (isExternal) {
             setUserOrderAddress(Address.parse(urlAddr));
         } else {
             GetUserOrderAddress(userAddress).then(setUserOrderAddress);
@@ -54,7 +54,7 @@ const OrdersPage: FC = () => {
     return (
         <div className="orderDetails">
             <div>
-                <h1 className="text-3xl m-7">{isAdmin ? 'User orders:' : 'My orders:'}</h1>
+                <h1 className="text-3xl m-7">{isExternal ? 'User orders:' : 'My orders:'}</h1>
                 {orders.length > 0 ? (
                     orders.map((o, id) => (
                         <OrderItem key={id} {...o} selectOrder={selectOrdersFunc} userOrderAddress={userOrderAddress} />
@@ -63,12 +63,17 @@ const OrdersPage: FC = () => {
                     <span>No orders yet :(</span>
                 )}
             </div>
-            <Button title={'Create new order'} className="my-3 mx-3" onClick={() => setShowCreateOrder(true)} />
+            <Button
+                title={'Create new order'}
+                className="my-3 mx-3"
+                onClick={() => setShowCreateOrder(true)}
+                hidden={isExternal}
+            />
             <Button
                 title={'Execute order'}
                 className="my-3"
                 onClick={executeSelectedOrders}
-                hidden={!isAdmin}
+                hidden={!isExternal}
                 disabled={selectedOrders.length === 0}
             />
 
@@ -77,4 +82,4 @@ const OrdersPage: FC = () => {
     );
 };
 
-export default OrdersPage;
+export default Orders;
