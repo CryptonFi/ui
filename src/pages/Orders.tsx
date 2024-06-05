@@ -57,7 +57,13 @@ const Orders: FC = () => {
                 <h1 className="text-3xl m-7">{isExternal ? 'User orders:' : 'My orders:'}</h1>
                 {orders.length > 0 ? (
                     orders.map((o, id) => (
-                        <OrderItem key={id} {...o} selectOrder={selectOrdersFunc} userOrderAddress={userOrderAddress} />
+                        <OrderItem
+                            key={id}
+                            {...o}
+                            selectOrder={selectOrdersFunc}
+                            userOrderAddress={userOrderAddress}
+                            isSelectable={isExternal}
+                        />
                     ))
                 ) : (
                     <span>No orders yet :(</span>

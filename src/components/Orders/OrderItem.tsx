@@ -9,6 +9,7 @@ import tonLogo from '../../assets/ton.png';
 interface OrderItemProps extends OrderRes {
     selectOrder: ChangeEventHandler<HTMLInputElement>;
     userOrderAddress?: Address;
+    isSelectable?: boolean;
 }
 
 const OrderItem: FC<OrderItemProps> = (props) => {
@@ -47,13 +48,17 @@ const OrderItem: FC<OrderItemProps> = (props) => {
 
     return (
         <a href="#" className="block p-6 bg-white border border-gray-200 rounded-lg shadow flex items-center">
-            <input
-                type="checkbox"
-                id={props.orderId}
-                name="orders"
-                className="w-5 h-5 mr-5 text-blue-600 rounded  dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
-                onChange={props.selectOrder}
-            />
+            {props.isSelectable ? (
+                <input
+                    type="checkbox"
+                    id={props.orderId}
+                    name="orders"
+                    className="w-5 h-5 mr-5 text-blue-600 rounded  dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+                    onChange={props.selectOrder}
+                />
+            ) : (
+                <></>
+            )}
             <div className="">
                 From:
                 <p className="font-bold flex items-center">
