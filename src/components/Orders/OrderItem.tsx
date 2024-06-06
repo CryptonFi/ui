@@ -1,10 +1,9 @@
 import { ChangeEventHandler, FC, useEffect, useState } from 'react';
 import { FaRegTrashAlt } from 'react-icons/fa';
-import { CloseOrder, OrderRes, PositionToString } from '../../api/Order';
+import { CloseOrder, OrderRes, PositionFriendly, PositionToFriendly } from '../../api/Order';
 import { FaArrowRightLong } from 'react-icons/fa6';
 import { useTonConnectUI } from '@tonconnect/ui-react';
 import { Address } from '@ton/core';
-import tonLogo from '../../assets/ton.png';
 
 interface OrderItemProps extends OrderRes {
     selectOrder: ChangeEventHandler<HTMLInputElement>;
@@ -13,25 +12,14 @@ interface OrderItemProps extends OrderRes {
 }
 
 const OrderItem: FC<OrderItemProps> = (props) => {
-    const [fromStr, setFromStr] = useState('');
-    const [toStr, setToStr] = useState('');
+    const [fromPos, setFromPos] = useState<PositionFriendly>();
+    const [toPos, setToPos] = useState<PositionFriendly>();
     const [tonConnectUI] = useTonConnectUI();
-
-    const tonImg = (
-        <img
-            src={tonLogo}
-            alt="TON"
-            className="size-6 ml-1 inline rounded-full outline outline-[1px] outline-offset-[-1px] outline-stroke"
-        ></img>
-    );
-    // TODO: add other jetton logos
-    const fromLogo = !props.fromAddress ? tonImg : '';
-    const toLogo = !props.toAddress ? tonImg : '';
 
     useEffect(() => {
         async function loadPositionRepr() {
-            setFromStr(await PositionToString(props.fromAddress, false, props.fromAmount));
-            setToStr(await PositionToString(props.toMasterAddress, true, props.toAmount));
+            setFromPos(await PositionToFriendly(props.fromAddress, false, props.fromAmount));
+            setToPos(await PositionToFriendly(props.toMasterAddress, true, props.toAmount));
         }
         loadPositionRepr();
     }, []);
@@ -59,18 +47,38 @@ const OrderItem: FC<OrderItemProps> = (props) => {
             ) : (
                 <></>
             )}
-            <div className="">
+            <div className="w-28 min-w-24">
                 From:
-                <p className="font-bold flex items-center">
-                    {fromStr} {fromLogo}
-                </p>
+                {fromPos ? (
+                    <div className="font-bold flex items-center">
+                        {fromPos.amount}
+                        <img
+                            src={fromPos.imgUrl}
+                            alt={fromPos.currency}
+                            className="size-4 ml-1 inline rounded-full outline outline-[1px] outline-offset-[-1px] outline-stroke"
+                        />
+                        {fromPos.currency}
+                    </div>
+                ) : (
+                    <div></div>
+                )}
             </div>
-            <FaArrowRightLong className="mx-8" />
-            <div>
+            <FaArrowRightLong className="ml-2 mr-8" />
+            <div className="w-28 min-w-24">
                 To:
-                <p className="font-bold flex items-center">
-                    {toStr} {toLogo}
-                </p>
+                {toPos ? (
+                    <div className="font-bold flex items-center">
+                        {toPos.amount}
+                        <img
+                            src={toPos.imgUrl}
+                            alt={toPos.currency}
+                            className="size-4 ml-1 inline rounded-full outline outline-[1px] outline-offset-[-1px] outline-stroke"
+                        />
+                        {toPos.currency}
+                    </div>
+                ) : (
+                    <div></div>
+                )}
             </div>
             <div className="ml-auto hover:bg-gray-300">
                 <FaRegTrashAlt onClick={CloseOrderUI} fontSize="1.1em" />

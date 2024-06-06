@@ -10,6 +10,11 @@ import { OrderData, OrderType, UserOrder } from './Wrappers/UserOrder';
 import { JettonMinter } from './Wrappers/JettonMinter';
 
 export type OrderRes = OrderData & { orderId: string };
+export type PositionFriendly = {
+    currency: string;
+    amount: number;
+    imgUrl: string;
+};
 
 let _tonClient: TonClient;
 
@@ -49,13 +54,20 @@ export async function FetchOrderDetails(userOrderAddress: Address): Promise<Arra
     return ordersList;
 }
 
-export async function PositionToString(address: Address | null, isMaster: boolean, amount: bigint) {
+export async function PositionToFriendly(
+    address: Address | null,
+    isMaster: boolean,
+    amount: bigint
+): Promise<PositionFriendly> {
     if (!address) {
-        return `${Number((amount * 100n) / 1_000_000_000n) / 100} TON`;
+        return {
+            currency: 'TON',
+            amount: Number((amount * 100n) / 1_000_000_000n) / 100,
+            imgUrl: 'https://raw.githubusercontent.com/CryptonFi/jettons/master/img/ton.png',
+        };
     }
 
     const client = await GetTonClient();
-
     const masterAddr = isMaster ? address : await LoadMasterAddr(client, address);
 
     // TODO: Load currency simbol and decimals from contract
@@ -63,7 +75,11 @@ export async function PositionToString(address: Address | null, isMaster: boolea
     const decimals = 1_000_000_000n;
     const amountN = Number((amount * 100n) / decimals) / 100;
 
-    return `${amountN} ${currency}`;
+    return {
+        currency: currency,
+        amount: amountN,
+        imgUrl: `https://raw.githubusercontent.com/CryptonFi/jettons/master/img/${currency.toLowerCase()}.png`,
+    };
 }
 
 async function LoadMasterAddr(client: TonClient, address: Address): Promise<Address | undefined> {
@@ -76,7 +92,7 @@ async function LoadMasterAddr(client: TonClient, address: Address): Promise<Addr
             const masterAddr = res.stack.readAddress();
             return masterAddr;
         } catch (err) {
-            console.log(`Error on wallet data fetching: ${err}`);
+            console.log(`Error on wallet ${address.toString()} data fetching: ${err}`);
 
             if (!isAxiosError(err)) return;
             await sleep(1000);
