@@ -6,7 +6,6 @@ import { ExecuteOrders, FetchOrderDetails, GetUserOrderAddress, OrderRes } from 
 import OrderItem from '../components/Orders/OrderItem';
 import Button from '../components/ui/Button';
 import NewOrderModal from '../components/Orders/NewOrderModal';
-import { PriceComponent } from '../components/Price.tsx';
 
 const Orders: FC = () => {
     const [orders, setOrders] = useState<Array<OrderRes>>([]);
