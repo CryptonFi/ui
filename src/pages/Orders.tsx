@@ -6,6 +6,7 @@ import { ExecuteOrders, FetchOrderDetails, GetUserOrderAddress, OrderRes } from 
 import OrderItem from '../components/Orders/OrderItem';
 import Button from '../components/ui/Button';
 import NewOrderModal from '../components/Orders/NewOrderModal';
+import { PriceComponent } from '../components/Price.tsx';
 
 const Orders: FC = () => {
     const [orders, setOrders] = useState<Array<OrderRes>>([]);
@@ -53,11 +54,8 @@ const Orders: FC = () => {
 
     return (
         <div className="orderDetails">
-            {/* <PriceComponent lpAddress="EQARK5MKz_MK51U5AZjK3hxhLg1SmQG2Z-4Pb7Zapi_xwmrN" />
-            <PriceComponent lpAddress="EQCgsOdELK_Yl2Y_OCuzX4tIX0rILe-5T2rTeu5t0sWdTx1r" />
-            <PriceComponent lpAddress="EQCVflRjTn91FKGZzy2UTHgLn3hG3TsOlQIsAOPcB57K5gT5" /> */}
             <div>
-                <h1 className="text-3xl m-6">{isExternal ? 'User orders:' : 'My orders:'}</h1>
+                <h1 className="text-3xl m-7">{isExternal ? 'User orders:' : 'My orders:'}</h1>
                 {orders.length > 0 ? (
                     orders.map((o, id) => (
                         <OrderItem
