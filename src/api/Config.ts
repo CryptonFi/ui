@@ -13,9 +13,6 @@ export const OP_EXECUTE_TON_ORDER = 0x3b016c81;
 
 export const CURRENCY_ADDRESSES: Record<string, string> = {
     TON: '0',
-    BATON: 'EQDLTkIMPWon-XoLCpMqWXsnn8a1Zgeav6xkqB-TOtHgWd8B',
-    BTC: 'EQAj_XKstRJvDdHjUSVN79bPZtCbYrnalEkafPQXmkCpoEq_',
-    LVT: 'EQBCSiok2KOPeq5T0xcoJ48YZYq9WRDbGFNzTeVjWOKvL9kX',
 
     GRAM: 'EQAN3PScHwP77_gko2l1ZF02IV4F1uTk15OExbUi9Idj8M2n',
     NOT: 'EQA4vUDA7rEidZI6voKuErOYpWWR5jGj2_WCBIwyqiiNMTdP',

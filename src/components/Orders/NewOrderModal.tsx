@@ -1,4 +1,4 @@
-import { FC } from 'react';
+import { FC, useState } from 'react';
 import { useTonAddress, useTonConnectUI } from '@tonconnect/ui-react';
 import Button from '../ui/Button';
 import { CURRENCY_ADDRESSES } from '../../api/Config';
@@ -10,6 +10,9 @@ interface NewOrderModalProps {
 }
 
 const NewOrderModal: FC<NewOrderModalProps> = ({ showModal, closeModal }) => {
+    const [selectedFrom, setSelectedFrom] = useState<string>('TON');
+    const [selectedTo, setSelectedTo] = useState<string>('USD₮');
+
     const [tonConnectUI] = useTonConnectUI();
     const userAddress = useTonAddress();
 
@@ -19,29 +22,35 @@ const NewOrderModal: FC<NewOrderModalProps> = ({ showModal, closeModal }) => {
 
         const fromCurr = formData.get('from-curr')?.toString() || '';
         const fromAmountStr = formData.get('from-amount')?.toString() || '';
-        const fromAmount = BigInt(fromAmountStr);
 
         const toCurr = formData.get('to-curr')?.toString() || '';
         const toAmountStr = formData.get('to-amount')?.toString() || '';
-        const toAmount = BigInt(toAmountStr);
 
         if (fromCurr !== 'TON' && toCurr !== 'TON') {
             CreateJettonJettonOrder(
                 tonConnectUI,
                 userAddress,
                 CURRENCY_ADDRESSES[fromCurr],
-                fromAmount,
+                fromAmountStr,
                 CURRENCY_ADDRESSES[toCurr],
-                toAmount
+                toAmountStr
             ).catch((e: any) => console.error(`Order creation failed with: ${e}`));
         } else if (fromCurr === 'TON' && toCurr !== 'TON') {
-            CreateTonJettonOrder(tonConnectUI, userAddress, fromAmount, CURRENCY_ADDRESSES[toCurr], toAmount).catch(
-                (e: any) => console.error(`Order creation failed with: ${e}`)
-            );
+            CreateTonJettonOrder(
+                tonConnectUI,
+                userAddress,
+                fromAmountStr,
+                CURRENCY_ADDRESSES[toCurr],
+                toAmountStr
+            ).catch((e: any) => console.error(`Order creation failed with: ${e}`));
         } else if (fromCurr !== 'TON' && toCurr === 'TON') {
-            CreateJettonTonOrder(tonConnectUI, userAddress, CURRENCY_ADDRESSES[fromCurr], fromAmount, toAmount).catch(
-                (e: any) => console.error(`Order creation failed with: ${e}`)
-            );
+            CreateJettonTonOrder(
+                tonConnectUI,
+                userAddress,
+                CURRENCY_ADDRESSES[fromCurr],
+                fromAmountStr,
+                toAmountStr
+            ).catch((e: any) => console.error(`Order creation failed with: ${e}`));
         } else {
             console.error('Unsupported order type');
         }
@@ -100,21 +109,24 @@ const NewOrderModal: FC<NewOrderModalProps> = ({ showModal, closeModal }) => {
                                         name="from-curr"
                                         className="mr-3 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
                                         required
+                                        onChange={(e) => setSelectedFrom(e.target.value)}
                                     >
-                                        <option value="">-</option>
-                                        {Object.keys(CURRENCY_ADDRESSES).map((i) => (
-                                            <option key={i} value={i}>
-                                                {i}
-                                            </option>
-                                        ))}
+                                        {Object.keys(CURRENCY_ADDRESSES)
+                                            .filter((i) => i !== selectedTo)
+                                            .map((i) => (
+                                                <option key={i} value={i} selected={i === selectedFrom}>
+                                                    {i}
+                                                </option>
+                                            ))}
                                     </select>
                                     <input
                                         type="number"
                                         name="from-amount"
                                         id="from-amount"
-                                        className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
+                                        className="text-right bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
                                         placeholder="0"
                                         min="0"
+                                        step=".001"
                                         required
                                     />
                                 </div>
@@ -132,21 +144,24 @@ const NewOrderModal: FC<NewOrderModalProps> = ({ showModal, closeModal }) => {
                                         name="to-curr"
                                         className="mr-3 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
                                         required
+                                        onChange={(e) => setSelectedTo(e.target.value)}
                                     >
-                                        <option value="">-</option>
-                                        {Object.keys(CURRENCY_ADDRESSES).map((i) => (
-                                            <option key={i} value={i}>
-                                                {i}
-                                            </option>
-                                        ))}
+                                        {Object.keys(CURRENCY_ADDRESSES)
+                                            .filter((i) => i !== selectedFrom)
+                                            .map((i) => (
+                                                <option key={i} value={i} selected={i === selectedTo}>
+                                                    {i}
+                                                </option>
+                                            ))}
                                     </select>
                                     <input
                                         type="number"
                                         name="to-amount"
                                         id="to-amount"
-                                        className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
+                                        className="text-right bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
                                         placeholder="0"
                                         min="0"
+                                        step=".001"
                                         required
                                     />
                                 </div>

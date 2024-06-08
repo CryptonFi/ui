@@ -13,7 +13,7 @@ function App() {
             <div className="app">
                 <Header />
                 <div className="main">
-                    <div className="xl:w-1/2 lg:w-3/4 md:w-10/12 sm:w-11/12">
+                    <div className="w-full p-5 sm:w-11/12 sm:px-0 md:w-10/12 md:px-0 lg:w-3/4 xl:w-1/2">
                         <Outlet />
                     </div>
                 </div>

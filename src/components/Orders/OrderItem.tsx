@@ -1,9 +1,9 @@
 import { ChangeEventHandler, FC, useEffect, useState } from 'react';
-import { FaRegTrashAlt } from 'react-icons/fa';
 import { CloseOrder, OrderRes, PositionFriendly, PositionToFriendly } from '../../api/Order';
 import { FaArrowRightLong } from 'react-icons/fa6';
 import { useTonConnectUI } from '@tonconnect/ui-react';
 import { Address } from '@ton/core';
+import { IoMdClose } from 'react-icons/io';
 
 interface OrderItemProps extends OrderRes {
     selectOrder: ChangeEventHandler<HTMLInputElement>;
@@ -35,7 +35,7 @@ const OrderItem: FC<OrderItemProps> = (props) => {
     };
 
     return (
-        <a href="#" className="block p-6 bg-white border border-gray-200 rounded-lg shadow flex items-center">
+        <a href="#" className="p-5 bg-white border border-gray-200 rounded-lg shadow flex items-center">
             {props.isSelectable ? (
                 <input
                     type="checkbox"
@@ -48,14 +48,14 @@ const OrderItem: FC<OrderItemProps> = (props) => {
                 <></>
             )}
             <div className="w-28 min-w-24">
-                From:
+                <span className="text-sm">From:</span>
                 {fromPos ? (
-                    <div className="font-bold flex items-center">
+                    <div className="text-xl flex items-center">
                         {fromPos.amount}
                         <img
                             src={fromPos.imgUrl}
                             alt={fromPos.currency}
-                            className="size-4 ml-1 inline rounded-full outline outline-[1px] outline-offset-[-1px] outline-stroke"
+                            className="size-5 ml-1 inline rounded-full outline outline-[1px] outline-offset-[-1px] outline-stroke"
                         />
                         {fromPos.currency}
                     </div>
@@ -65,14 +65,14 @@ const OrderItem: FC<OrderItemProps> = (props) => {
             </div>
             <FaArrowRightLong className="ml-2 mr-8" />
             <div className="w-28 min-w-24">
-                To:
+                <span className="text-sm">To:</span>
                 {toPos ? (
-                    <div className="font-bold flex items-center">
+                    <div className="text-xl flex items-center">
                         {toPos.amount}
                         <img
                             src={toPos.imgUrl}
                             alt={toPos.currency}
-                            className="size-4 ml-1 inline rounded-full outline outline-[1px] outline-offset-[-1px] outline-stroke"
+                            className="size-5 ml-1.5 inline rounded-full outline outline-[1px] outline-offset-[-1px] outline-stroke"
                         />
                         {toPos.currency}
                     </div>
@@ -81,7 +81,7 @@ const OrderItem: FC<OrderItemProps> = (props) => {
                 )}
             </div>
             <div className="ml-auto hover:bg-gray-300">
-                <FaRegTrashAlt onClick={CloseOrderUI} fontSize="1.1em" />
+                <IoMdClose onClick={CloseOrderUI} fontSize="1.3em" />
             </div>
         </a>
     );

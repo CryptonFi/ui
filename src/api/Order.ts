@@ -104,9 +104,9 @@ export async function CreateJettonJettonOrder(
     tonConnectUI: TonConnectUI,
     creatorAddr: string,
     fromAddr: string,
-    fromAmount: bigint,
+    fromAmountStr: string,
     toAddr: string,
-    toAmount: bigint
+    toAmountStr: string
 ) {
     const client = await GetTonClient();
     const masterContract = client.open(new MasterOrder(MASTER_ORDER_ADDRESS));
@@ -119,6 +119,9 @@ export async function CreateJettonJettonOrder(
     const userOrderJettonToAddr = await jettonToContract.getWalletAddress(userOrderAddr);
 
     const query_id = 123;
+    // TODO: calculate precision based on token metadata
+    const fromAmount = toNano(fromAmountStr);
+    const toAmount = toNano(toAmountStr);
 
     const res = await tonConnectUI.sendTransaction({
         // 10 minutes from now
@@ -131,7 +134,7 @@ export async function CreateJettonJettonOrder(
                     .storeUint(0xf8a7ea5, 32) // op code - jetton transfer
                     .storeUint(query_id, 64)
                     // TODO: replace toNano!
-                    .storeCoins(toNano(fromAmount))
+                    .storeCoins(fromAmount)
                     .storeAddress(MASTER_ORDER_ADDRESS)
                     .storeAddress(Address.parse(creatorAddr))
                     .storeBit(0)
@@ -143,7 +146,7 @@ export async function CreateJettonJettonOrder(
                             .storeUint(query_id, 64)
                             .storeUint(OrderType.JETTON_JETTON, 8)
                             .storeAddress(userOrderJettonToAddr)
-                            .storeCoins(toNano(toAmount))
+                            .storeCoins(toAmount)
                             .storeAddress(Address.parse(toAddr))
                             .endCell()
                     )
@@ -161,14 +164,18 @@ export async function CreateJettonTonOrder(
     tonConnectUI: TonConnectUI,
     creatorAddr: string,
     fromAddr: string,
-    fromAmount: bigint,
-    toAmount: bigint
+    fromAmountStr: string,
+    toAmountStr: string
 ) {
     const client = await GetTonClient();
     const jettonFromContract = client.open(JettonMinter.createFromAddress(Address.parse(fromAddr)));
     const userJettonFromWalletAddr = await jettonFromContract.getWalletAddress(Address.parse(creatorAddr));
 
     const query_id = 123;
+    // TODO: calculate precision based on token metadata
+    const fromAmount = toNano(fromAmountStr);
+    const toAmount = toNano(toAmountStr);
+
     const res = await tonConnectUI.sendTransaction({
         // 10 minutes from now
         validUntil: Math.floor(Date.now() / 1000) + 600,
@@ -179,8 +186,7 @@ export async function CreateJettonTonOrder(
                 payload: beginCell()
                     .storeUint(0xf8a7ea5, 32) // op code - jetton transfer
                     .storeUint(query_id, 64)
-                    // TODO: replace toNano!
-                    .storeCoins(toNano(fromAmount))
+                    .storeCoins(fromAmount)
                     .storeAddress(MASTER_ORDER_ADDRESS)
                     .storeAddress(Address.parse(creatorAddr))
                     .storeBit(0)
@@ -191,7 +197,7 @@ export async function CreateJettonTonOrder(
                             .storeUint(0xc1c6ebf9, 32) // op code - create_order
                             .storeUint(query_id, 64)
                             .storeUint(OrderType.JETTON_TON, 8)
-                            .storeCoins(toNano(toAmount))
+                            .storeCoins(toAmount)
                             .endCell()
                     )
                     .endCell()
@@ -207,9 +213,9 @@ export async function CreateJettonTonOrder(
 export async function CreateTonJettonOrder(
     tonConnectUI: TonConnectUI,
     creatorAddr: string,
-    fromAmount: bigint,
+    fromAmountStr: string,
     toAddr: string,
-    toAmount: bigint
+    toAmountStr: string
 ) {
     const client = await GetTonClient();
     const masterContract = client.open(new MasterOrder(MASTER_ORDER_ADDRESS));
@@ -219,19 +225,23 @@ export async function CreateTonJettonOrder(
     const userOrderJettonToAddr = await jettonToContract.getWalletAddress(userOrderAddr);
 
     const queryId = 123;
+    // TODO: calculate precision based on token metadata
+    const fromAmount = toNano(fromAmountStr);
+    const toAmount = toNano(toAmountStr);
+
     const res = await tonConnectUI.sendTransaction({
         // 10 minutes from now
         validUntil: Math.floor(Date.now() / 1000) + 600,
         messages: [
             {
-                amount: (toNano(fromAmount) + toNano(0.4)).toString(),
+                amount: (fromAmount + toNano(0.4)).toString(),
                 address: MASTER_ORDER_ADDRESS.toString(),
                 payload: beginCell()
                     .storeUint(0x76fd6f67, 32) // create_ton_order
                     .storeUint(queryId, 64)
-                    .storeCoins(toNano(fromAmount))
+                    .storeCoins(fromAmount)
                     .storeAddress(userOrderJettonToAddr)
-                    .storeCoins(toNano(toAmount))
+                    .storeCoins(toAmount)
                     .storeAddress(Address.parse(toAddr))
                     .endCell()
                     .toBoc()
