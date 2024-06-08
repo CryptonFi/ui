@@ -214,6 +214,7 @@ export async function CreateTonJettonOrder(
     const client = await GetTonClient();
     const masterContract = client.open(new MasterOrder(MASTER_ORDER_ADDRESS));
     const userOrderAddr = await masterContract.getWalletAddress(Address.parse(creatorAddr));
+
     const jettonToContract = client.open(JettonMinter.createFromAddress(Address.parse(toAddr)));
     const userOrderJettonToAddr = await jettonToContract.getWalletAddress(userOrderAddr);
 

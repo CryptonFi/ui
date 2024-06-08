@@ -17,12 +17,12 @@ export const CURRENCY_ADDRESSES: Record<string, string> = {
     BTC: 'EQAj_XKstRJvDdHjUSVN79bPZtCbYrnalEkafPQXmkCpoEq_',
     LVT: 'EQBCSiok2KOPeq5T0xcoJ48YZYq9WRDbGFNzTeVjWOKvL9kX',
 
-    GRAM: 'EQAX3hBEmXpPN0SMIzb5_ZYG6dLouXt9jOH_w4hmSiGC4Bn9',
-    NOT: 'EQClFdpClmrgRbh4JWR3DzTt8XL_U5FXDQkBcAKeQr6DT4dw',
-    STON: 'EQBo-cbzSU0zpkQHee1FGzoHM8peY08p4HrtsuOq336fsLLb',
-    'USD₮': 'EQBHuIjzT5hr7nkvzTyIijlDDUnlnNYrqAWDWzQ0HxTQARCb',
-    FISH: 'EQCTB-lZAJFbe1m6yfcaCIYK8pig5iC0_Pm0w3m_E6Dt3wHU',
-    HIF: 'EQA9Wh1dkjQIFkBZi8CyrPt72omu60X5R9Li3gDhKQlkUOiO',
+    GRAM: 'EQAN3PScHwP77_gko2l1ZF02IV4F1uTk15OExbUi9Idj8M2n',
+    NOT: 'EQA4vUDA7rEidZI6voKuErOYpWWR5jGj2_WCBIwyqiiNMTdP',
+    STON: 'EQAjm8Db5pHlW27jvlBOaDHe5smtaxmpMgm0zjSZ_6QsnWuY',
+    'USD₮': 'EQCL1FH085zADKW9xXAmXGmqhOxxCcvQo6SnbhY75DIwmrTl',
+    FISH: 'EQBmixzri81nz9RSK8IsZ0JmoLI3BkRNhXytgOMo1A2ZGyGf',
+    HIF: 'EQDTXaFOMjW16eThuZpNhajCfloI9oAjtkf6SEns-YLCX_bL',
 };
 
 export const ADDRESS_CURRENCIES = Object.assign(
