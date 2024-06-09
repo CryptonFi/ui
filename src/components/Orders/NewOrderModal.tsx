@@ -3,6 +3,7 @@ import { useTonAddress, useTonConnectUI } from '@tonconnect/ui-react';
 import Button from '../ui/Button';
 import { CURRENCY_ADDRESSES } from '../../api/Config';
 import { CreateJettonJettonOrder, CreateJettonTonOrder, CreateTonJettonOrder } from '../../api/Order';
+import { PriceComponent } from '../Price';
 
 interface NewOrderModalProps {
     showModal: boolean;
@@ -112,11 +113,12 @@ const NewOrderModal: FC<NewOrderModalProps> = ({ showModal, closeModal }) => {
                                         className="mr-3 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
                                         required
                                         onChange={(e) => setSelectedFrom(e.target.value)}
+                                        defaultValue={selectedFrom}
                                     >
                                         {Object.keys(CURRENCY_ADDRESSES)
                                             .filter((i) => i !== selectedTo)
                                             .map((i) => (
-                                                <option key={i} value={i} selected={i === selectedFrom}>
+                                                <option key={i} value={i}>
                                                     {i}
                                                 </option>
                                             ))}
@@ -134,6 +136,9 @@ const NewOrderModal: FC<NewOrderModalProps> = ({ showModal, closeModal }) => {
                                         required
                                     />
                                 </div>
+                                <div className="text-sm text-gray-500 flex justify-end">
+                                    <PriceComponent tokenSymbol={selectedFrom} amount={Number(amountFrom)} />
+                                </div>
                             </div>
                             <div>
                                 <label
@@ -149,11 +154,12 @@ const NewOrderModal: FC<NewOrderModalProps> = ({ showModal, closeModal }) => {
                                         className="mr-3 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
                                         required
                                         onChange={(e) => setSelectedTo(e.target.value)}
+                                        defaultValue={selectedTo}
                                     >
                                         {Object.keys(CURRENCY_ADDRESSES)
                                             .filter((i) => i !== selectedFrom)
                                             .map((i) => (
-                                                <option key={i} value={i} selected={i === selectedTo}>
+                                                <option key={i} value={i}>
                                                     {i}
                                                 </option>
                                             ))}
@@ -170,6 +176,9 @@ const NewOrderModal: FC<NewOrderModalProps> = ({ showModal, closeModal }) => {
                                         value={amountTo}
                                         required
                                     />
+                                </div>
+                                <div className="text-sm text-gray-500 flex justify-end">
+                                    <PriceComponent tokenSymbol={selectedTo} amount={Number(amountTo)} />
                                 </div>
                             </div>
                             <Button title="Create"></Button>
