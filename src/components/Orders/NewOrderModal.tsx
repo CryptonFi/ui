@@ -12,6 +12,8 @@ interface NewOrderModalProps {
 const NewOrderModal: FC<NewOrderModalProps> = ({ showModal, closeModal }) => {
     const [selectedFrom, setSelectedFrom] = useState<string>('TON');
     const [selectedTo, setSelectedTo] = useState<string>('USD₮');
+    const [amountFrom, setAmountFrom] = useState<string>('1');
+    const [amountTo, setAmountTo] = useState<string>('');
 
     const [tonConnectUI] = useTonConnectUI();
     const userAddress = useTonAddress();
@@ -127,6 +129,8 @@ const NewOrderModal: FC<NewOrderModalProps> = ({ showModal, closeModal }) => {
                                         placeholder="0"
                                         min="0"
                                         step=".001"
+                                        onChange={(e) => setAmountFrom(e.target.value)}
+                                        value={amountFrom}
                                         required
                                     />
                                 </div>
@@ -162,6 +166,8 @@ const NewOrderModal: FC<NewOrderModalProps> = ({ showModal, closeModal }) => {
                                         placeholder="0"
                                         min="0"
                                         step=".001"
+                                        onChange={(e) => setAmountTo(e.target.value)}
+                                        value={amountTo}
                                         required
                                     />
                                 </div>
