@@ -17,9 +17,11 @@ const TOKEN_TO_LP: { [key: string]: string } = {
 export const PriceComponent: React.FC<PriceComponentProps> = ({ tokenSymbol, amount }) => {
     let positionUsd = 0;
     if (tokenSymbol === 'TON') {
-        positionUsd = useTonTokenPrice() || 0;
+        const tonPrice = useTonTokenPrice() || 0;
+        positionUsd = tonPrice * amount;
+
     } else if (tokenSymbol === 'USD₮') {
-        positionUsd = 1;
+        positionUsd = amount;
     } else {
         const lpAddress = TOKEN_TO_LP[tokenSymbol];
         const priceData = useTokenPrice(lpAddress);
