@@ -37,10 +37,7 @@ const OrderItem: FC<OrderItemProps> = (props) => {
     };
 
     return (
-        <a
-            href="#"
-            className="p-4 sm:p-4 md:p-4 lg:p-5 xl:p-5 bg-white border border-gray-200 rounded-lg shadow flex items-center"
-        >
+        <a href="#" className="p-4 bg-white border border-gray-200 rounded-lg shadow flex items-center">
             {props.isSelectable ? (
                 <input
                     type="checkbox"
