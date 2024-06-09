@@ -39,7 +39,7 @@ const OrderItem: FC<OrderItemProps> = (props) => {
     return (
         <a
             href="#"
-            className="sm:p-4 md:p-4 lg:p-5 xl:p-5 bg-white border border-gray-200 rounded-lg shadow flex items-center"
+            className="p-4 sm:p-4 md:p-4 lg:p-5 xl:p-5 bg-white border border-gray-200 rounded-lg shadow flex items-center"
         >
             {props.isSelectable ? (
                 <input
