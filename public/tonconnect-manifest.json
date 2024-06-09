@@ -1,7 +1,7 @@
 {
     "url": "https://cryptonfi.github.io/ui/",
-    "name": "Crypton App",
-    "iconUrl": "https://cryptonfi.github.io/ui/apple-touch-icon.png",
+    "name": "Crypton.fi",
+    "iconUrl": "https://cryptonfi.github.io/ui/crypton-logo.png",
     "termsOfUseUrl": "https://cryptonfi.github.io/ui/terms-of-use.txt",
     "privacyPolicyUrl": "https://cryptonfi.github.io/ui/privacy-policy.txt"
 }
