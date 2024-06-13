@@ -43,7 +43,7 @@ const OrderItem: FC<OrderItemProps> = (props) => {
                     type="checkbox"
                     id={props.orderId}
                     name="orders"
-                    className="w-5 h-5 mr-5 sm:mr-3 md:mr-3 lg:mr-5 xl:mr-5 text-blue-600 rounded  dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+                    className="w-5 h-5 mr-3 sm:mr-3 md:mr-3 lg:mr-3 xl:mr-5 text-blue-600 rounded  dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
                     onChange={props.selectOrder}
                 />
             ) : (
@@ -70,7 +70,7 @@ const OrderItem: FC<OrderItemProps> = (props) => {
                     <div></div>
                 )}
             </div>
-            <FaArrowRightLong className="ml-2 mr-8" />
+            <FaArrowRightLong className="ml-2 mr-6 xl:mr-8" />
             <div className="w-28 min-w-24">
                 <span className="text-sm">To:</span>
                 {toPos ? (
