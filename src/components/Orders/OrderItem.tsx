@@ -3,13 +3,14 @@ import { CloseOrder, OrderRes, PositionFriendly, PositionToFriendly } from '../.
 import { FaArrowRightLong } from 'react-icons/fa6';
 import { useTonConnectUI } from '@tonconnect/ui-react';
 import { Address } from '@ton/core';
-import { IoMdClose } from 'react-icons/io';
+import { FaRegTrashAlt } from 'react-icons/fa';
 import { PriceComponent } from '../Price.tsx';
 
 interface OrderItemProps extends OrderRes {
     selectOrder: ChangeEventHandler<HTMLInputElement>;
     userOrderAddress?: Address;
     isSelectable?: boolean;
+    isCloseable?: boolean;
 }
 
 const OrderItem: FC<OrderItemProps> = (props) => {
@@ -92,9 +93,13 @@ const OrderItem: FC<OrderItemProps> = (props) => {
                     <div></div>
                 )}
             </div>
-            <div className="ml-auto hover:bg-gray-300">
-                <IoMdClose onClick={CloseOrderUI} fontSize="1.3em" />
-            </div>
+            {props.isCloseable ? (
+                <div className="ml-auto hover:bg-gray-300">
+                    <FaRegTrashAlt onClick={CloseOrderUI} fontSize="1.3em" />
+                </div>
+            ) : (
+                <></>
+            )}
         </a>
     );
 };

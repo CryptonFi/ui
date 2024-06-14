@@ -63,6 +63,7 @@ const Orders: FC = () => {
                             selectOrder={selectOrdersFunc}
                             userOrderAddress={userOrderAddress}
                             isSelectable={isExternal}
+                            isCloseable={!isExternal}
                         />
                     ))
                 ) : (
