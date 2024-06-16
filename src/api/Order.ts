@@ -2,12 +2,12 @@ import { TonClient } from '@ton/ton';
 import { Address, beginCell, toNano } from '@ton/core';
 import { isAxiosError } from 'axios';
 import { TonConnectUI } from '@tonconnect/ui-react';
-import { getHttpEndpoint } from '@orbs-network/ton-access';
 import { ADDRESS_CURRENCIES, MASTER_ORDER_ADDRESS } from './Config';
 import { sleep } from './Helpers';
 import { MasterOrder } from './Wrappers/MasterOrder';
 import { OrderData, OrderType, UserOrder } from './Wrappers/UserOrder';
 import { JettonMinter } from './Wrappers/JettonMinter';
+import { GetTonClient } from './Client';
 
 export type OrderRes = OrderData & { orderId: string };
 export type PositionFriendly = {
@@ -15,16 +15,6 @@ export type PositionFriendly = {
     amount: number;
     imgUrl: string;
 };
-
-let _tonClient: TonClient;
-
-async function GetTonClient() {
-    if (_tonClient === undefined) {
-        const endpoint = await getHttpEndpoint({ network: 'testnet' });
-        _tonClient = new TonClient({ endpoint });
-    }
-    return _tonClient;
-}
 
 export async function GetUserOrderAddress(userAddress: string): Promise<Address> {
     const client = await GetTonClient();

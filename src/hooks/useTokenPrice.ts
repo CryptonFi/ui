@@ -1,13 +1,6 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-
-const TOKEN_TO_LP: { [key: string]: string } = {
-    NOT: 'EQARK5MKz_MK51U5AZjK3hxhLg1SmQG2Z-4Pb7Zapi_xwmrN',
-    GRAM: 'EQASBZLwa2vfdsgoDF2w96pdccBJJRxDNXXPUL7NMm0WdnMx',
-    STON: 'EQDtZHOtVWaf9UIU6rmjLPNLTGxNLNogvK5xUZlMRgZwQ4Gt',
-    FISH: 'EQCVflRjTn91FKGZzy2UTHgLn3hG3TsOlQIsAOPcB57K5gT5',
-    HIF: 'EQCgsOdELK_Yl2Y_OCuzX4tIX0rILe-5T2rTeu5t0sWdTx1r',
-};
+import { CURRENCY_ADDRESSES } from '../api/Config';
 
 const useTokenPrice = (tokenSymbol: string) => {
     const [price, setPrice] = useState<number | null>(null);
@@ -16,7 +9,7 @@ const useTokenPrice = (tokenSymbol: string) => {
 
     const fetchJettonPrice = async () => {
         try {
-            const lpAddress = TOKEN_TO_LP[tokenSymbol];
+            const lpAddress = CURRENCY_ADDRESSES[tokenSymbol].lp;
             const response = await axios.get(`https://api.dexscreener.com/latest/dex/pairs/ton/${lpAddress}`);
             setPrice(response.data.pair.priceUsd);
             setBaseTokenSymbol(response.data.pair.baseToken.symbol);
