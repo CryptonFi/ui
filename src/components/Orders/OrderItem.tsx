@@ -11,6 +11,7 @@ interface OrderItemProps extends OrderRes {
     userOrderAddress?: Address;
     isSelectable?: boolean;
     isCloseable?: boolean;
+    onClose: Function;
 }
 
 const OrderItem: FC<OrderItemProps> = (props) => {
@@ -29,6 +30,7 @@ const OrderItem: FC<OrderItemProps> = (props) => {
 
     const CloseOrderUI = () => {
         if (props.userOrderAddress) {
+            props.onClose();
             CloseOrder(tonConnectUI, props.userOrderAddress, props.orderId).catch((e) =>
                 console.error(`Order removal failed with: ${e}`)
             );

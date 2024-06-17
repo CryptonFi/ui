@@ -10,10 +10,11 @@ import { GetTokenBalance } from '../../api/Balance';
 
 interface NewOrderModalProps {
     showModal: boolean;
-    closeModal: Function;
+    onClose: Function;
+    onCreate: Function;
 }
 
-const NewOrderModal: FC<NewOrderModalProps> = ({ showModal, closeModal }) => {
+const NewOrderModal: FC<NewOrderModalProps> = (props) => {
     const [selectedFrom, setSelectedFrom] = useState<string>('TON');
     const [selectedTo, setSelectedTo] = useState<string>('USD₮');
     const [amountFrom, setAmountFrom] = useState<string>('');
@@ -75,7 +76,8 @@ const NewOrderModal: FC<NewOrderModalProps> = ({ showModal, closeModal }) => {
             console.error('Unsupported order type');
         }
 
-        closeModal();
+        props.onClose();
+        props.onCreate();
     };
 
     const modalHtml = (
@@ -93,7 +95,7 @@ const NewOrderModal: FC<NewOrderModalProps> = ({ showModal, closeModal }) => {
                         <button
                             type="button"
                             className="end-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white"
-                            onClick={() => closeModal()}
+                            onClick={() => props.onClose()}
                         >
                             <svg
                                 className="w-3 h-3"
@@ -225,7 +227,12 @@ const NewOrderModal: FC<NewOrderModalProps> = ({ showModal, closeModal }) => {
                             <div className="text-sm text-gray-500 flex justify-end">
                                 <PriceComponent tokenSymbol={selectedTo} amount={Number(amountTo)} />
                             </div>
-                            <Alert text={alertText} show={alertText !== ''} closeAlert={() => setAlertText('')} />
+                            <Alert
+                                text={alertText}
+                                show={alertText !== ''}
+                                closeAlert={() => setAlertText('')}
+                                level={2}
+                            />
                             <Button title="Create"></Button>
                         </form>
                     </div>
@@ -234,7 +241,7 @@ const NewOrderModal: FC<NewOrderModalProps> = ({ showModal, closeModal }) => {
         </div>
     );
 
-    if (showModal) return modalHtml;
+    if (props.showModal) return modalHtml;
     else return <></>;
 };
 

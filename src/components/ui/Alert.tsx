@@ -1,23 +1,34 @@
 import { FC } from 'react';
 
+enum Level {
+    info = 1,
+    error = 2,
+}
+
 interface AlertProps {
     text: string;
     show: boolean;
     closeAlert: Function;
+    level: Level;
 }
 
-const Alert: FC<AlertProps> = ({ text, show, closeAlert }) => {
+const Alert: FC<AlertProps> = ({ text, show, closeAlert, level = Level.info }) => {
+    let textStyle = 'text-green-800 bg-green-50 dark:bg-gray-800 dark:text-green-400';
+    let buttonStyle =
+        'bg-green-50 text-green-500 focus:ring-green-400 hover:bg-green-200 dark:bg-gray-800 dark:text-green-400 dark:hover:bg-gray-700';
+    if (level === Level.error) {
+        textStyle = 'text-red-800 bg-red-50 dark:bg-gray-800 dark:text-red-400';
+        buttonStyle =
+            'bg-red-50 text-red-500 focus:ring-red-400 hover:bg-red-200 dark:bg-gray-800 dark:text-red-400 dark:hover:bg-gray-700';
+    }
     if (show)
         return (
-            <div
-                className="flex items-center p-4 mb-4 text-red-800 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400"
-                role="alert"
-            >
+            <div className={`flex items-center p-4 mb-4 rounded-lg ${textStyle}`} role="alert">
                 <span className="sr-only">Info</span>
                 <div className="ms-3 text-sm font-medium">{text}</div>
                 <button
                     type="button"
-                    className="ms-auto -mx-1.5 -my-1.5 bg-red-50 text-red-500 rounded-lg focus:ring-2 focus:ring-red-400 p-1.5 hover:bg-red-200 inline-flex items-center justify-center h-8 w-8 dark:bg-gray-800 dark:text-red-400 dark:hover:bg-gray-700"
+                    className={`ms-auto -mx-1.5 -my-1.5 rounded-lg focus:ring-2 inline-flex items-center justify-center h-8 w-8 ${buttonStyle}`}
                     aria-label="Close"
                     onClick={() => closeAlert()}
                 >

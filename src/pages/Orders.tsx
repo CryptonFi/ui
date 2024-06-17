@@ -6,6 +6,7 @@ import { ExecuteOrders, FetchOrderDetails, GetUserOrderAddress, OrderRes } from 
 import OrderItem from '../components/Orders/OrderItem';
 import Button from '../components/ui/Button';
 import NewOrderModal from '../components/Orders/NewOrderModal';
+import Alert from '../components/ui/Alert';
 
 const Orders: FC = () => {
     const [orders, setOrders] = useState<Array<OrderRes>>([]);
@@ -13,6 +14,7 @@ const Orders: FC = () => {
     const [userOrderAddress, setUserOrderAddress] = useState<Address>();
     const [showCreateOrder, setShowCreateOrder] = useState<boolean>(false);
     const [selectedOrders, setSelectedOrders] = useState<Array<string>>([]);
+    const [msgText, setMsgText] = useState<string>('');
 
     const [queryParams, _] = useSearchParams();
     const urlAddr = queryParams.get('address');
@@ -47,6 +49,9 @@ const Orders: FC = () => {
             ExecuteOrders(tonConnectUI, userOrderAddress, userAddress, ordersList)
                 .then(() => {
                     setSelectedOrders([]);
+                    setMsgText(
+                        'Order execution was successfully called. Please approve it in your wallet and refresh the page in some time...'
+                    );
                 })
                 .catch((e) => console.error(`Order execution failed with: ${e}`));
     };
@@ -64,12 +69,19 @@ const Orders: FC = () => {
                             userOrderAddress={userOrderAddress}
                             isSelectable={isExternal}
                             isCloseable={!isExternal}
+                            onClose={() =>
+                                setMsgText(
+                                    'Order removal was successfully called. Please approve it in your wallet and refresh the page in some time...'
+                                )
+                            }
                         />
                     ))
                 ) : (
                     <span>No orders yet :(</span>
                 )}
             </div>
+            <Alert text={msgText} show={msgText !== ''} closeAlert={() => setMsgText('')} level={1} />
+
             <Button
                 title={'Create new order'}
                 className="my-3 mx-3"
@@ -84,7 +96,15 @@ const Orders: FC = () => {
                 disabled={selectedOrders.length === 0}
             />
 
-            <NewOrderModal showModal={showCreateOrder} closeModal={() => setShowCreateOrder(false)} />
+            <NewOrderModal
+                showModal={showCreateOrder}
+                onClose={() => setShowCreateOrder(false)}
+                onCreate={() =>
+                    setMsgText(
+                        'Order creation was successfully called. Please approve it in your wallet and refresh the page in some time...'
+                    )
+                }
+            />
         </div>
     );
 };
