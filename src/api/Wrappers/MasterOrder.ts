@@ -46,9 +46,10 @@ export class MasterOrder implements Contract {
         opts: {
             value: bigint;
             queryId: number;
+            orderId: number;
             fromAmount: bigint;
             toAddress: Address;
-            toAmount: number;
+            toAmount: bigint;
             toMasterAddress: Address;
         }
     ) {
@@ -58,6 +59,7 @@ export class MasterOrder implements Contract {
             body: beginCell()
                 .storeUint(0x76fd6f67, 32) // create_ton_order
                 .storeUint(opts.queryId, 64)
+                .storeUint(opts.orderId, 32)
                 .storeCoins(opts.fromAmount)
                 .storeAddress(opts.toAddress)
                 .storeCoins(opts.toAmount)

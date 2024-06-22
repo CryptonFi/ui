@@ -106,7 +106,7 @@ const OrderItem: FC<OrderItemProps> = (props) => {
                 )}
             </div>
             <div className="">
-                <Progress procent={0} />
+                <Progress procent={(1 - Number(props.fromAmountLeft) / Number(props.fromAmount)) * 100} />
             </div>
         </a>
     );

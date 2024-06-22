@@ -1,7 +1,7 @@
 import { Address } from '@ton/core';
 
 // Testnet
-export const MASTER_ORDER_ADDRESS = Address.parse('EQAV5ikoa7DzsgdE4WLaUQLYYm5egLnHwHpKQ5cHsWqLvzm7');
+export const MASTER_ORDER_ADDRESS = Address.parse('EQADNWMDEpeeQKW2Diy2nz04LtRDWdpuydKTPVyFZqI9PZpt');
 export const TON_API_ENDPOINT = 'https://testnet.tonapi.io/';
 export const TON_CLIENT_URL = 'https://testnet.toncenter.com/api/v2/jsonRPC';
 
