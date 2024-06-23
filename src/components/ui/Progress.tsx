@@ -11,7 +11,7 @@ const Progress: FC<ProgressProps> = ({ procent, style }) => {
             <div className="w-full bg-gray-200 rounded-full h-2 dark:bg-gray-700">
                 <div className="bg-blue-400 h-1.5 rounded-full" style={{ width: `${procent}%` }}></div>
             </div>
-            <span className="ml-2 text-sm font-medium text-gray-700 dark:text-white">{procent}%</span>
+            <span className="ml-2 text-sm font-medium text-gray-700 dark:text-white">{Math.floor(procent)}%</span>
         </div>
     );
 };
