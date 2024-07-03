@@ -281,7 +281,7 @@ export async function ExecuteOrders(
             const jettonToContract = client.open(JettonMinter.createFromAddress(order.toMasterAddress!));
             const executorJettonWalletAddr = await jettonToContract.getWalletAddress(Address.parse(executorAddr));
             const msg = {
-                amount: toNano(0.2).toString(),
+                amount: toNano(0.25).toString(),
                 address: executorJettonWalletAddr.toString(),
                 payload: beginCell()
                     .storeUint(0xf8a7ea5, 32) // op code - jetton transfer
@@ -290,7 +290,7 @@ export async function ExecuteOrders(
                     .storeAddress(userOrderAddr)
                     .storeAddress(Address.parse(executorAddr))
                     .storeBit(0)
-                    .storeCoins(toNano('0.2'))
+                    .storeCoins(toNano('0.15'))
                     .storeBit(1)
                     .storeRef(
                         beginCell()
